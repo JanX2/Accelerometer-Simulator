@@ -17,6 +17,7 @@
 NSString * const	NetworkTargetIPAddressKey		= @"com.enzymia.test.AccSim.networkTargetIPAddress";
 
 NSString * const	LoopbackDeviceIPAddress			= @"127.0.0.1";
+NSString * const	BroadcastIPAddress				= @"255.255.255.255";
 
 
 // default UDP port
@@ -202,7 +203,7 @@ NSString * const	LoopbackDeviceIPAddress			= @"127.0.0.1";
 				// input is IP address, so use numbers and dots keyboard
 				ipAddressView.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
 				// init in broadcast mode
-				ipAddressView.text = @"255.255.255.255";
+				ipAddressView.text = BroadcastIPAddress;
 				ipAddressView.enabled = NO;
 
 				// delegate is needed for keyboard control
@@ -360,7 +361,7 @@ NSString * const	LoopbackDeviceIPAddress			= @"127.0.0.1";
 		ipAddressView.textColor = [UIColor lightGrayColor];
 
 		// show broadcast address
-		ipAddressView.text = @"255.255.255.255";
+		ipAddressView.text = BroadcastIPAddress;
 		targetAddress.sin_addr.s_addr = 0xFFFFFFFF;
 		// enable broadcast mode on socket
 		int broadcast = 1;
