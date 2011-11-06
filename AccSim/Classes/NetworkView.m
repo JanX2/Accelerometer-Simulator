@@ -197,7 +197,7 @@ NSString * const	LoopbackDeviceIPAddress			= @"127.0.0.1";
 				
 				CGRect rect = CGRectMake(139, 7, 150, 26);
 				ipAddressView.frame = rect;
-				ipAddressView.textColor = [UIColor darkGrayColor];
+				ipAddressView.textColor = [UIColor lightGrayColor];
 				ipAddressView.borderStyle = UITextBorderStyleRoundedRect;
 				// input is IP address, so use numbers and dots keyboard
 				ipAddressView.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
@@ -357,7 +357,7 @@ NSString * const	LoopbackDeviceIPAddress			= @"127.0.0.1";
 	{
 		// set IP address to broadcast address and disable address text field
 		ipAddressView.enabled = NO;
-		ipAddressView.textColor = [UIColor darkGrayColor];
+		ipAddressView.textColor = [UIColor lightGrayColor];
 
 		// show broadcast address
 		ipAddressView.text = @"255.255.255.255";
