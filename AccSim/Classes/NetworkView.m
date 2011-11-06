@@ -13,6 +13,12 @@
 #include <arpa/inet.h>
 #include <errno.h>
 
+
+NSString * const	NetworkTargetIPAddressKey		= @"com.enzymia.test.AccSim.networkTargetIPAddress";
+
+NSString * const	LoopbackDeviceIPAddress			= @"127.0.0.1";
+
+
 // default UDP port
 #define kAccelerometerSimulationPort 10552
 
@@ -37,7 +43,18 @@
 		ipAddressView = [[UITextField alloc] initWithFrame:CGRectZero];
 		ipPortView = [[UITextField alloc] initWithFrame:CGRectZero];
 		// default unicast address is localhost
-		ipAddress = @"127.0.0.1";
+		NSString *networkTargetIPAddress = [[NSUserDefaults standardUserDefaults] valueForKey:NetworkTargetIPAddressKey];
+		if (networkTargetIPAddress != nil) {
+			self.ipAddress = networkTargetIPAddress;
+			ipAddressView.text = self.ipAddress;
+		}
+		else {
+			[[NSUserDefaults standardUserDefaults] registerDefaults:
+			 [NSDictionary dictionaryWithObjectsAndKeys:
+			  LoopbackDeviceIPAddress, NetworkTargetIPAddressKey, 
+			  nil]];
+			self.ipAddress = LoopbackDeviceIPAddress;
+		}
 		// start in network disabled mode
 		networkEnabled = NO;
 	
@@ -262,8 +279,8 @@
 	if( [textField isEqual:ipAddressView])
 	{
 		// store IP, convert from text to IP
-		ipAddress = [ipAddressView.text copy];
-		const char *addr = [[ipAddressView text] UTF8String];
+		self.ipAddress = ipAddressView.text;
+		const char *addr = [self.ipAddress UTF8String];
 		inet_aton(addr, &targetAddress.sin_addr);
 	}
 	if( [textField isEqual:ipPortView] )
@@ -326,6 +343,8 @@
 	
     // unregister for keyboard notifications while not visible.
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil]; 
+	
+    [super viewWillDisappear:animated];
 }
 
 // switch between broadcast and unicast
@@ -354,8 +373,8 @@
 		ipAddressView.textColor = [UIColor blackColor];
 
 		// retrieve stored IP address
-		ipAddressView.text = ipAddress;
-		const char *addr = [ipAddress UTF8String];
+		ipAddressView.text = self.ipAddress;
+		const char *addr = [self.ipAddress UTF8String];
 		inet_aton(addr, &targetAddress.sin_addr);
 		
 		// disable broadcast mode on socket
@@ -400,8 +419,27 @@
 	[ipAddressView release];
 	[ipPortView release];
 	[networkMode release];
+	
+	self.ipAddress = nil;
+
     [super dealloc];
 }
+
+
+- (NSString *)ipAddress {
+    return [[ipAddress retain] autorelease];
+}
+
+- (void)setIpAddress:(NSString *)value {
+    if (ipAddress != value) {
+        [ipAddress release];
+        ipAddress = [value copy];
+		
+		[[NSUserDefaults standardUserDefaults] setObject:ipAddress 
+												  forKey:NetworkTargetIPAddressKey];
+    }
+}
+
 
 
 @end

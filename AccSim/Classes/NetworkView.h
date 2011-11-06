@@ -29,4 +29,6 @@
 @property (nonatomic, retain) UITableView *myTableView;
 @property (nonatomic, retain) UINavigationBar *myNavigationBar;
 
+@property (nonatomic, copy) NSString *ipAddress;
+
 @end
