@@ -14,6 +14,7 @@
 #include <errno.h>
 
 
+NSString * const	NetworkEnabledKey				= @"com.enzymia.test.AccSim.networkEnabledKey";
 NSString * const	NetworkTargetIPAddressKey		= @"com.enzymia.test.AccSim.networkTargetIPAddress";
 
 NSString * const	LoopbackDeviceIPAddress			= @"127.0.0.1";
@@ -37,6 +38,13 @@ NSString * const	BroadcastIPAddress				= @"255.255.255.255";
 // Override initWithNibName:bundle: to load the view using a nib file then perform additional customization that is not appropriate for viewDidLoad.
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+		NSUserDefaults *standardUserDefaults = [NSUserDefaults standardUserDefaults];
+		[standardUserDefaults registerDefaults:
+		 [NSDictionary dictionaryWithObjectsAndKeys:
+		  [NSNumber numberWithBool:NO], NetworkEnabledKey, 
+		  LoopbackDeviceIPAddress, NetworkTargetIPAddressKey, 
+		  nil]];
+		
 		// create UI controls
 		networkMode = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"Unicast",@"Broadcast",nil]];
 		// default is broadcast
@@ -44,20 +52,23 @@ NSString * const	BroadcastIPAddress				= @"255.255.255.255";
 		ipAddressView = [[UITextField alloc] initWithFrame:CGRectZero];
 		ipPortView = [[UITextField alloc] initWithFrame:CGRectZero];
 		// default unicast address is localhost
-		NSString *networkTargetIPAddress = [[NSUserDefaults standardUserDefaults] valueForKey:NetworkTargetIPAddressKey];
+		NSString *networkTargetIPAddress = [standardUserDefaults valueForKey:NetworkTargetIPAddressKey];
 		if (networkTargetIPAddress != nil) {
 			self.ipAddress = networkTargetIPAddress;
 			ipAddressView.text = self.ipAddress;
 		}
 		else {
-			[[NSUserDefaults standardUserDefaults] registerDefaults:
-			 [NSDictionary dictionaryWithObjectsAndKeys:
-			  LoopbackDeviceIPAddress, NetworkTargetIPAddressKey, 
-			  nil]];
 			self.ipAddress = LoopbackDeviceIPAddress;
 		}
-		// start in network disabled mode
-		networkEnabled = NO;
+		
+		// start network in previous mode
+		NSNumber *networkEnabledFromDefaults = [standardUserDefaults valueForKey:NetworkEnabledKey];
+		if (networkEnabledFromDefaults != nil) {
+			networkEnabled = [networkEnabledFromDefaults boolValue];
+		}
+		else {
+			networkEnabled = NO;
+		}
 	
 		// listen to updates from AccelerometerViewControl
 		[[NSNotificationCenter defaultCenter] addObserver:self 
@@ -153,6 +164,7 @@ NSString * const	BroadcastIPAddress				= @"255.255.255.255";
 				[onOffSwitch addTarget:self 
 								action:@selector(networkToggled:) 
 					  forControlEvents:UIControlEventValueChanged];
+				[onOffSwitch setOn:networkEnabled];
 				[cell.contentView addSubview:onOffSwitch];
 				[onOffSwitch release];
 				
@@ -389,6 +401,10 @@ NSString * const	BroadcastIPAddress				= @"255.255.255.255";
 	NSLog(@"Network toggled: New value is %d\n", 
 		  control.on);
 	networkEnabled = control.on;
+	
+	[[NSUserDefaults standardUserDefaults] setBool:networkEnabled
+											forKey:NetworkEnabledKey];
+
 }
 /*
 // Implement loadView to create a view hierarchy programmatically.
