@@ -25,7 +25,7 @@
 	newInfo.y = y;
 	newInfo.z = z;
 	
-	return newInfo;
+	return [newInfo autorelease];
 }
 
 @end

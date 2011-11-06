@@ -101,7 +101,7 @@
 			if (cell == nil) {
 				CGRect rect = CGRectMake(0, 0, 300, 44);
 			
-				cell = [[UITableViewCell alloc] initWithFrame:rect reuseIdentifier:@"Mode"];
+				cell = [[[UITableViewCell alloc] initWithFrame:rect reuseIdentifier:@"Mode"] autorelease];
 				cell.selectionStyle = UITableViewCellSelectionStyleNone;
 				
 				UILabel *title;
@@ -155,7 +155,7 @@
 			if (cell == nil) {
 				CGRect rect = CGRectMake(0, 0, 300, 44);
 				
-				cell = [[UITableViewCell alloc] initWithFrame:rect reuseIdentifier:sliderName];
+				cell = [[[UITableViewCell alloc] initWithFrame:rect reuseIdentifier:sliderName] autorelease];
 				cell.selectionStyle = UITableViewCellSelectionStyleNone;
 				
 				UILabel *title;

@@ -127,34 +127,34 @@
 			// create Network enabled switch
 			cell = (UITableViewCell*)[tableView dequeueReusableCellWithIdentifier:@"NetEnabled"];
 			if (cell == nil) {
-				CGRect rect;
-				
-				cell = [[UITableViewCell alloc] initWithFrame:rect reuseIdentifier:@"NetEnabled"];
+				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"NetEnabled"];
 				cell.selectionStyle = UITableViewCellSelectionStyleNone;
 
-				rect = CGRectMake(195.0, 8.0, 60.0, 40.0);
+				CGRect rect = CGRectMake(195.0, 8.0, 60.0, 40.0);
 				UISwitch *onOffSwitch = [[UISwitch alloc] initWithFrame:rect];
 				[onOffSwitch addTarget:self 
 								action:@selector(networkToggled:) 
 					  forControlEvents:UIControlEventValueChanged];
 				[cell.contentView addSubview:onOffSwitch];
+				[onOffSwitch release];
 				
 				rect = CGRectMake(20, 0, 150, 40);
 				UILabel *title = [[UILabel alloc] initWithFrame:rect];
 				[title setText:@"Network"];
 				[cell.contentView addSubview:title];
+				[title release];
+				
+				[cell autorelease];
 			}
 			return cell;
 		case 01:
 			// create Unicast | Broadcast selector
 			cell = (UITableViewCell*)[tableView dequeueReusableCellWithIdentifier:@"NetMode"];
 			if (cell == nil) {
-				CGRect rect = CGRectMake(0, 0, 300, 44);
-				
-				cell = [[UITableViewCell alloc] initWithFrame:rect reuseIdentifier:@"NetMode"];
+				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"NetMode"];
 				cell.selectionStyle = UITableViewCellSelectionStyleNone;
 				
-				rect = CGRectMake(139, 7, 170, 30);
+				CGRect rect = CGRectMake(139, 7, 170, 30);
 				networkMode.frame = rect;
 				networkMode.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleHeight;
 				networkMode.segmentedControlStyle = UISegmentedControlStyleBar;
@@ -168,17 +168,17 @@
 				[title setText:@"Mode"];
 				[cell.contentView addSubview:title];
 				[title release];
+				
+				[cell autorelease];
 			}
 			return cell;
 		case 10:
 			cell = (UITableViewCell*)[tableView dequeueReusableCellWithIdentifier:@"IPAddress"];
 			if (cell == nil) {
-				CGRect rect = CGRectMake(0, 0, 300, 44);
-				
-				cell = [[UITableViewCell alloc] initWithFrame:rect reuseIdentifier:@"IPAddress"];
+				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"IPAddress"];
 				cell.selectionStyle = UITableViewCellSelectionStyleNone;
 				
-				rect = CGRectMake(139, 7, 150, 26);
+				CGRect rect = CGRectMake(139, 7, 150, 26);
 				ipAddressView.frame = rect;
 				ipAddressView.textColor = [UIColor darkGrayColor];
 				ipAddressView.borderStyle = UITextBorderStyleRoundedRect;
@@ -197,17 +197,17 @@
 				[title setText:@"Address"];
 				[cell.contentView addSubview:title];
 				[title release];
+				
+				[cell autorelease];
 			}
 			return cell;
 		case 11:
 			cell = (UITableViewCell*)[tableView dequeueReusableCellWithIdentifier:@"IPPort"];
 			if (cell == nil) {
-				CGRect rect = CGRectMake(0, 0, 300, 44);
-				
-				cell = [[UITableViewCell alloc] initWithFrame:rect reuseIdentifier:@"IPPort"];
+				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"IPPort"];
 				cell.selectionStyle = UITableViewCellSelectionStyleNone;
 				
-				rect = CGRectMake(139, 7, 150, 26);
+				CGRect rect = CGRectMake(139, 7, 150, 26);
 				ipPortView.frame = rect;
 				ipPortView.borderStyle = UITextBorderStyleRoundedRect;
 				ipPortView.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
@@ -223,6 +223,8 @@
 				[title setText:@"Port"];
 				[cell.contentView addSubview:title];
 				[title release];
+				
+				[cell autorelease];
 			}
 			return cell;
 	}
