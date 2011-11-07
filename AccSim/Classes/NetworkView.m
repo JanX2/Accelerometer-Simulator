@@ -17,13 +17,14 @@
 NSString * const	NetworkEnabledKey				= @"com.enzymia.test.AccSim.networkEnabledKey";
 NSString * const	NetworkModeKey					= @"com.enzymia.test.AccSim.networkModeKey";
 NSString * const	NetworkTargetIPAddressKey		= @"com.enzymia.test.AccSim.networkTargetIPAddress";
+NSString * const	NetworkTargetPortKey			= @"com.enzymia.test.AccSim.networkTargetPort";
 
 NSString * const	LoopbackDeviceIPAddress			= @"127.0.0.1";
 NSString * const	BroadcastIPAddress				= @"255.255.255.255";
 
 
 // default UDP port
-#define kAccelerometerSimulationPort 10552
+#define kAccelerometerSimulationPort			10552
 
 // the amount of vertical shift upwards keep the text field in view as the keyboard appears
 #define kOFFSET_FOR_KEYBOARD					100.0
@@ -51,6 +52,7 @@ NSString * const	BroadcastIPAddress				= @"255.255.255.255";
 		  [NSNumber numberWithBool:NO], NetworkEnabledKey, 
 		  [NSNumber numberWithInteger:networkModeIndex], NetworkModeKey, 
 		  LoopbackDeviceIPAddress, NetworkTargetIPAddressKey, 
+		  [NSNumber numberWithInt:kAccelerometerSimulationPort], NetworkTargetPortKey, 
 		  nil]];
 		
 		// create UI controls
@@ -67,8 +69,7 @@ NSString * const	BroadcastIPAddress				= @"255.255.255.255";
 		else {
 			self.ipAddress = LoopbackDeviceIPAddress;
 		}
-
-
+		
 		// start network in previous mode
 		NSNumber *networkEnabledFromDefaults = [standardUserDefaults valueForKey:NetworkEnabledKey];
 		if (networkEnabledFromDefaults != nil) {
@@ -101,8 +102,16 @@ NSString * const	BroadcastIPAddress				= @"255.255.255.255";
 		// broadcast address 255.255.255.255
 		// TODO: figure out device IP address and netmask, produce a subnet broadcast address
 		targetAddress.sin_addr.s_addr = htonl(0xFFFFFFFF);
-		targetAddress.sin_port = htons(kAccelerometerSimulationPort);
 		targetAddress.sin_len = sizeof(targetAddress);
+
+		NSNumber *networkPortFromDefaults = [standardUserDefaults valueForKey:NetworkTargetPortKey];
+		if (networkPortFromDefaults != nil) {
+			targetAddress.sin_port = htons([networkPortFromDefaults intValue]);
+		}
+		else {
+			targetAddress.sin_port = htons(kAccelerometerSimulationPort);
+		}
+
     }
     return self;
 }
@@ -314,7 +323,10 @@ NSString * const	BroadcastIPAddress				= @"255.255.255.255";
 	if( [textField isEqual:ipPortView] )
 	{
 		// store port, remember host to net conversion
-		targetAddress.sin_port = htons([[ipPortView text] intValue]);
+		int port = ipPortView.text.intValue;
+		[[NSUserDefaults standardUserDefaults] setInteger:port
+												   forKey:NetworkTargetPortKey];
+		targetAddress.sin_port = htons(port);
 	}
 	if  (self.view.frame.origin.y < 0)
 	{
