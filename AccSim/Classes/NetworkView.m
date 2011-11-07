@@ -43,19 +43,21 @@ NSString * const	BroadcastIPAddress				= @"255.255.255.255";
 // Override initWithNibName:bundle: to load the view using a nib file then perform additional customization that is not appropriate for viewDidLoad.
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+		NSUInteger networkModeIndex = 1; // default is broadcast
+
 		NSUserDefaults *standardUserDefaults = [NSUserDefaults standardUserDefaults];
 		[standardUserDefaults registerDefaults:
 		 [NSDictionary dictionaryWithObjectsAndKeys:
 		  [NSNumber numberWithBool:NO], NetworkEnabledKey, 
+		  [NSNumber numberWithInteger:networkModeIndex], NetworkModeKey, 
 		  LoopbackDeviceIPAddress, NetworkTargetIPAddressKey, 
 		  nil]];
 		
 		// create UI controls
 		networkMode = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"Unicast",@"Broadcast",nil]];
-		// default is broadcast
-		networkMode.selectedSegmentIndex = 1;
 		ipAddressView = [[UITextField alloc] initWithFrame:CGRectZero];
 		ipPortView = [[UITextField alloc] initWithFrame:CGRectZero];
+		
 		// default unicast address is localhost
 		NSString *networkTargetIPAddress = [standardUserDefaults valueForKey:NetworkTargetIPAddressKey];
 		if (networkTargetIPAddress != nil) {
@@ -65,7 +67,8 @@ NSString * const	BroadcastIPAddress				= @"255.255.255.255";
 		else {
 			self.ipAddress = LoopbackDeviceIPAddress;
 		}
-		
+
+
 		// start network in previous mode
 		NSNumber *networkEnabledFromDefaults = [standardUserDefaults valueForKey:NetworkEnabledKey];
 		if (networkEnabledFromDefaults != nil) {
@@ -75,6 +78,13 @@ NSString * const	BroadcastIPAddress				= @"255.255.255.255";
 			networkEnabled = NO;
 		}
 	
+		NSNumber *networkModeFromDefaults = [standardUserDefaults valueForKey:NetworkModeKey];
+		if (networkModeFromDefaults != nil) {
+			networkModeIndex = [networkModeFromDefaults integerValue];
+		}
+		[self switchToMode:networkModeIndex];
+		networkMode.selectedSegmentIndex = networkModeIndex;
+		
 		// listen to updates from AccelerometerViewControl
 		[[NSNotificationCenter defaultCenter] addObserver:self 
 												 selector:@selector(accelerationUpdate:) 
@@ -381,6 +391,8 @@ NSString * const	BroadcastIPAddress				= @"255.255.255.255";
 	}
 	else
 	{
+		modeIndex = 0;
+		
 		// set IP address to user specified address and enable it
 		ipAddressView.enabled = YES;
 		ipAddressView.textColor = [UIColor blackColor];
@@ -394,6 +406,9 @@ NSString * const	BroadcastIPAddress				= @"255.255.255.255";
 		int broadcast = 0;
 		setsockopt(udpSocket, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof(int));
 	}
+	
+	[[NSUserDefaults standardUserDefaults] setInteger:modeIndex
+											   forKey:NetworkModeKey];
 }
 
 // switch between broadcast and unicast
