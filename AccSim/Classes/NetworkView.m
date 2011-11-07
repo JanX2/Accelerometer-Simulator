@@ -15,6 +15,7 @@
 
 
 NSString * const	NetworkEnabledKey				= @"com.enzymia.test.AccSim.networkEnabledKey";
+NSString * const	NetworkModeKey					= @"com.enzymia.test.AccSim.networkModeKey";
 NSString * const	NetworkTargetIPAddressKey		= @"com.enzymia.test.AccSim.networkTargetIPAddress";
 
 NSString * const	LoopbackDeviceIPAddress			= @"127.0.0.1";
@@ -29,6 +30,10 @@ NSString * const	BroadcastIPAddress				= @"255.255.255.255";
 
 // the duration of the animation for the view shift
 #define kVerticalOffsetAnimationDuration		0.30
+
+@interface NetworkView (Private)
+- (void)switchToMode:(NSInteger)modeIndex;
+@end
 
 @implementation NetworkView
 
@@ -360,18 +365,13 @@ NSString * const	BroadcastIPAddress				= @"255.255.255.255";
     [super viewWillDisappear:animated];
 }
 
-// switch between broadcast and unicast
-- (void)modeChanged:(UISegmentedControl*)control {
-	NSLog(@"Mode changed: New value is %d\n", 
-		  control.selectedSegmentIndex);
-	[[NSNotificationCenter defaultCenter] postNotificationName:@"NetworkModeSwitch" object:control];
-	
-	if( control.selectedSegmentIndex == 1 )
+- (void)switchToMode:(NSInteger)modeIndex {
+	if( modeIndex == 1 )
 	{
 		// set IP address to broadcast address and disable address text field
 		ipAddressView.enabled = NO;
 		ipAddressView.textColor = [UIColor lightGrayColor];
-
+		
 		// show broadcast address
 		ipAddressView.text = BroadcastIPAddress;
 		targetAddress.sin_addr.s_addr = 0xFFFFFFFF;
@@ -384,7 +384,7 @@ NSString * const	BroadcastIPAddress				= @"255.255.255.255";
 		// set IP address to user specified address and enable it
 		ipAddressView.enabled = YES;
 		ipAddressView.textColor = [UIColor blackColor];
-
+		
 		// retrieve stored IP address
 		ipAddressView.text = self.ipAddress;
 		const char *addr = [self.ipAddress UTF8String];
@@ -394,6 +394,15 @@ NSString * const	BroadcastIPAddress				= @"255.255.255.255";
 		int broadcast = 0;
 		setsockopt(udpSocket, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof(int));
 	}
+}
+
+// switch between broadcast and unicast
+- (void)modeChanged:(UISegmentedControl*)control {
+	NSLog(@"Mode changed: New value is %d\n", 
+		  control.selectedSegmentIndex);
+	[[NSNotificationCenter defaultCenter] postNotificationName:@"NetworkModeSwitch" object:control];
+	
+	[self switchToMode:control.selectedSegmentIndex];
 }
 
 // enable/disable network
