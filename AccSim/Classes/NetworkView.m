@@ -384,7 +384,7 @@ NSString * const	BroadcastIPAddress				= @"255.255.255.255";
 		
 		// show broadcast address
 		ipAddressView.text = BroadcastIPAddress;
-		targetAddress.sin_addr.s_addr = 0xFFFFFFFF;
+		targetAddress.sin_addr.s_addr = htonl(0xFFFFFFFF);
 		// enable broadcast mode on socket
 		int broadcast = 1;
 		setsockopt(udpSocket, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof(int));
